@@ -1,5 +1,14 @@
 import React from 'react';
 
+// Color gradient from green to red based on percentage (intensity)
+const getColor = (pct: number) => {
+  if (pct >= 30) return '#dc2626'; // red-600
+  if (pct >= 20) return '#ea580c'; // orange-600
+  if (pct >= 10) return '#f59e0b'; // amber-500
+  if (pct >= 5) return '#84cc16'; // lime-500
+  return '#22c55e'; // green-500
+};
+
 export default function InsightsDemoPage() {
   const categories = [
     { name: 'Transportation', emissions: '15.2 kg', transactions: 8, percentage: 36, trend: 'down' },
@@ -78,8 +87,8 @@ export default function InsightsDemoPage() {
                 </div>
                 <div className="h-3 w-full rounded-full bg-gray-100 overflow-hidden">
                   <div
-                    className="h-full bg-[#1B4332] rounded-full transition-all duration-300 hover:scale-y-125 hover:h-4 origin-bottom cursor-pointer"
-                    style={{ width: `${category.percentage}%` }}
+                    className="h-full rounded-full"
+                    style={{ width: `${category.percentage}%`, backgroundColor: getColor(category.percentage) }}
                     title={`${category.percentage}% of total emissions`}
                   />
                 </div>

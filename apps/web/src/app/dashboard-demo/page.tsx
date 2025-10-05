@@ -1,5 +1,14 @@
 import React from 'react';
 
+// Color gradient from green to red based on percentage (intensity)
+const getColor = (pct: number) => {
+  if (pct >= 30) return '#dc2626'; // red-600
+  if (pct >= 20) return '#ea580c'; // orange-600
+  if (pct >= 10) return '#f59e0b'; // amber-500
+  if (pct >= 5) return '#84cc16'; // lime-500
+  return '#22c55e'; // green-500
+};
+
 export default function DashboardDemoPage() {
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-[#E5FCD4] text-black">
@@ -84,11 +93,11 @@ export default function DashboardDemoPage() {
           <h2 className="text-xl font-bold text-[#1B4332] mb-6">Emissions by Category</h2>
           <div className="space-y-4">
             {[
-              { category: 'Transportation', amount: '15.2 kg', percentage: 36, color: '#1B4332' },
-              { category: 'Food & Dining', amount: '12.8 kg', percentage: 30, color: '#2D5F4C' },
-              { category: 'Utilities', amount: '8.5 kg', percentage: 20, color: '#52B788' },
-              { category: 'Shopping', amount: '4.2 kg', percentage: 10, color: '#74C69D' },
-              { category: 'Other', amount: '1.8 kg', percentage: 4, color: '#95D5B2' },
+              { category: 'Transportation', amount: '15.2 kg', percentage: 36 },
+              { category: 'Food & Dining', amount: '12.8 kg', percentage: 30 },
+              { category: 'Utilities', amount: '8.5 kg', percentage: 20 },
+              { category: 'Shopping', amount: '4.2 kg', percentage: 10 },
+              { category: 'Other', amount: '1.8 kg', percentage: 4 },
             ].map((item) => (
               <div key={item.category}>
                 <div className="flex items-center justify-between mb-2">
@@ -97,8 +106,8 @@ export default function DashboardDemoPage() {
                 </div>
                 <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all duration-300 hover:scale-y-125 hover:h-4 origin-bottom cursor-pointer"
-                    style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
+                    className="h-full rounded-full"
+                    style={{ width: `${item.percentage}%`, backgroundColor: getColor(item.percentage) }}
                     title={`${item.percentage}% of total emissions`}
                   />
                 </div>
