@@ -1,0 +1,366 @@
+================================================================================
+COMPLETE TROUBLESHOOTING GUIDE: Tailwind CSS Not Working in Next.js 14
+================================================================================
+
+PROBLEM: Tailwind CSS utility classes are not applying styles in a Next.js 14
+application with TypeScript in a pnpm monorepo setup.
+
+================================================================================
+SYMPTOMS
+================================================================================
+
+- Tailwind classes like bg-[#E5FCD4], text-center, flex are written in 
+  components but produce no visual styling
+- Browser DevTools shows classes in HTML but no computed CSS styles
+- No error messages in console
+- @tailwind directives are present in globals.css
+- Manual Tailwind CLI build works, but Next.js dev server doesn't apply styles
+
+================================================================================
+ROOT CAUSES
+================================================================================
+
+This issue typically stems from FOUR interconnected problems:
+
+1. **Incorrect Content Paths** - Tailwind isn't scanning the right files
+2. **PostCSS Configuration Format** - Next.js can't process the config
+3. **Next.js Aggressive Caching** - Old builds persist despite changes
+4. **Route Group Conflicts** - (Optional) Routing issues prevent pages from 
+   rendering
+
+================================================================================
+COMPLETE SOLUTION
+================================================================================
+
+--------------------------------------------------------------------------------
+Step 1: Fix Tailwind Content Paths
+--------------------------------------------------------------------------------
+
+PROBLEM: Tailwind's JIT compiler needs to know which files to scan for class 
+names. If your files are in src/ but your config points to root-level 
+directories, Tailwind generates empty CSS.
+
+FIX: Update apps/web/tailwind.config.ts (or .js):
+
+```typescript
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: [
+    // ❌ WRONG - Missing src/ prefix
+    // './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    // './components/**/*.{js,ts,jsx,tsx,mdx}',
+    // './app/**/*.{js,ts,jsx,tsx,mdx}',
+    
+    // ✅ CORRECT - Includes src/ directory
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    
+    // ✅ BEST - Catch-all pattern
+    './src/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      // Your custom theme here
+    },
+  },
+  plugins: [],
+};
+
+export default config;
+```
+
+WHY THIS MATTERS: Tailwind uses these globs to scan files for class names. 
+Wrong paths = no classes found = empty CSS output.
+
+--------------------------------------------------------------------------------
+Step 2: Fix PostCSS Configuration Format
+--------------------------------------------------------------------------------
+
+PROBLEM: Next.js in monorepo setups (especially with pnpm + turbo) sometimes 
+fails to resolve ES module PostCSS configs.
+
+FIX: Convert apps/web/postcss.config.mjs to CommonJS format:
+
+1. DELETE postcss.config.mjs (if it exists)
+2. CREATE apps/web/postcss.config.js:
+
+```javascript
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+```
+
+WHY THIS MATTERS: CommonJS (module.exports) is more universally compatible 
+with Next.js build tooling than ES modules (export default).
+
+--------------------------------------------------------------------------------
+Step 3: Verify CSS Import Chain
+--------------------------------------------------------------------------------
+
+Ensure globals.css is properly imported:
+
+CHECK apps/web/src/app/globals.css:
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Your custom CSS below */
+```
+
+CHECK apps/web/src/app/layout.tsx:
+
+```typescript
+import './globals.css';  // ← This line is CRITICAL
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+WHY THIS MATTERS: Without the import, Tailwind directives never get processed 
+by Next.js.
+
+--------------------------------------------------------------------------------
+Step 4: Nuclear Cache Clear
+--------------------------------------------------------------------------------
+
+PROBLEM: Next.js aggressively caches PostCSS/Tailwind processing. Config 
+changes often don't take effect until you force a complete rebuild.
+
+FIX: Run this command sequence:
+
+```bash
+# 1. Kill all dev servers
+pkill -f "next dev"
+pkill -f "pnpm dev"
+
+# 2. Delete Next.js cache
+rm -rf apps/web/.next
+
+# 3. (Optional but recommended) Clear node_modules
+rm -rf node_modules
+rm -rf apps/web/node_modules
+
+# 4. Reinstall dependencies
+pnpm install
+
+# 5. Restart dev server
+pnpm dev
+```
+
+WHY THIS MATTERS: Cached PostCSS processors won't pick up config changes 
+without a hard reset.
+
+--------------------------------------------------------------------------------
+Step 5: (Optional) Fix Route Group Conflicts
+--------------------------------------------------------------------------------
+
+PROBLEM: Next.js App Router's parallel routing with (app) route groups can 
+interfere with root-level pages.
+
+SYMPTOM: You get "404: This page could not be found" or NEXT_NOT_FOUND errors.
+
+FIX: Rename route group directories:
+
+```
+# Before (causes conflicts):
+apps/web/src/app/(app)/layout.tsx
+apps/web/src/app/page.tsx  # ← Conflicts with (app) group
+
+# After (no conflicts):
+apps/web/src/app/app/layout.tsx  # ← No parentheses
+apps/web/src/app/page.tsx        # ← Now works!
+```
+
+Or move your homepage inside the route group:
+
+```
+apps/web/src/app/(app)/page.tsx  # Homepage for authenticated users
+apps/web/src/app/login/page.tsx  # Login page outside group
+```
+
+WHY THIS MATTERS: Parallel routes with (app) can intercept root path requests, 
+preventing your homepage from rendering.
+
+================================================================================
+VERIFICATION STEPS
+================================================================================
+
+After applying fixes, verify Tailwind is working:
+
+--------------------------------------------------------------------------------
+Test 1: Visual Inspection
+--------------------------------------------------------------------------------
+Visit http://localhost:3000 and check if styles appear.
+
+--------------------------------------------------------------------------------
+Test 2: DevTools Check
+--------------------------------------------------------------------------------
+1. Open browser DevTools (F12)
+2. Inspect an element with Tailwind classes
+3. Check "Computed" tab - you should see CSS properties applied
+4. Check "Styles" tab - you should see .bg-\[#E5FCD4\] or similar classes
+
+--------------------------------------------------------------------------------
+Test 3: Hot Reload Test
+--------------------------------------------------------------------------------
+1. Change a color: bg-red-500 → bg-blue-500
+2. Save file
+3. Page should update immediately with new color
+4. This confirms Tailwind is processing changes in real-time
+
+--------------------------------------------------------------------------------
+Test 4: Manual Build Test
+--------------------------------------------------------------------------------
+```bash
+# Build production version
+pnpm build
+
+# If successful, Tailwind is working correctly
+```
+
+================================================================================
+STILL NOT WORKING? ADDITIONAL DEBUGGING
+================================================================================
+
+--------------------------------------------------------------------------------
+Check 1: Verify Tailwind Generates CSS
+--------------------------------------------------------------------------------
+
+Run a standalone Tailwind build to isolate the issue:
+
+```bash
+cd apps/web
+npx tailwindcss -i ./src/app/globals.css -o ./test-output.css
+```
+
+- If test-output.css is empty: Your content paths are wrong (Step 1)
+- If test-output.css has CSS: The issue is with Next.js integration (Step 2 or 4)
+
+--------------------------------------------------------------------------------
+Check 2: Inspect HTML Output
+--------------------------------------------------------------------------------
+
+View page source (Ctrl+U) and look for:
+- <link rel="stylesheet" href="..."> - Should reference Next.js CSS
+- Search for "tailwind" - Should find CSS variables or utility classes
+
+--------------------------------------------------------------------------------
+Check 3: Check for Conflicting Configs
+--------------------------------------------------------------------------------
+
+```bash
+# Look for multiple config files
+find apps/web -name "tailwind.config.*"
+find apps/web -name "postcss.config.*"
+```
+
+Delete any duplicates or outdated configs.
+
+--------------------------------------------------------------------------------
+Check 4: Verify Package Versions
+--------------------------------------------------------------------------------
+
+```bash
+cd apps/web
+pnpm list tailwindcss postcss autoprefixer
+```
+
+Ensure compatible versions:
+- tailwindcss: ^3.0.0+
+- postcss: ^8.0.0+
+- autoprefixer: ^10.0.0+
+
+================================================================================
+QUICK CHECKLIST
+================================================================================
+
+Copy this checklist when troubleshooting:
+
+[ ] Content paths in tailwind.config.ts include ./src/**/*.{js,ts,jsx,tsx,mdx}
+[ ] postcss.config.js exists and uses module.exports format
+[ ] @tailwind directives exist in globals.css
+[ ] globals.css is imported in layout.tsx
+[ ] Cleared .next cache and restarted dev server
+[ ] No route group conflicts ((app) vs root pages)
+[ ] Manual Tailwind CLI build produces CSS
+[ ] Browser DevTools shows computed styles
+[ ] Hot reload works when changing classes
+
+================================================================================
+EXPECTED OUTCOME
+================================================================================
+
+After completing all steps:
+
+✅ Tailwind classes apply immediately  
+✅ Hot reload works for style changes  
+✅ Production build succeeds  
+✅ No console warnings about missing CSS  
+✅ Browser DevTools shows computed Tailwind styles  
+
+================================================================================
+PLATFORM-SPECIFIC NOTES
+================================================================================
+
+--------------------------------------------------------------------------------
+macOS Users
+--------------------------------------------------------------------------------
+
+You may see "Watchpack Error (watcher): Error: EMFILE: too many open files" 
+warnings. These are NON-BREAKING but annoying.
+
+OPTIONAL FIX:
+
+```bash
+echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf
+echo kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf
+sudo sysctl -w kern.maxfiles=65536
+sudo sysctl -w kern.maxfilesperproc=65536
+```
+
+--------------------------------------------------------------------------------
+Windows Users
+--------------------------------------------------------------------------------
+
+Use PowerShell or Git Bash for terminal commands. Replace rm -rf with 
+Remove-Item -Recurse -Force in PowerShell.
+
+================================================================================
+PREVENTION FOR FUTURE PROJECTS
+================================================================================
+
+To avoid this issue in new projects:
+
+1. **Use explicit paths** - Always include src/ in Tailwind content paths
+2. **Prefer CommonJS configs** - Use .js with module.exports for PostCSS
+3. **Test early** - Verify Tailwind works before writing extensive markup
+4. **Document setup** - Add a "Troubleshooting" section to your project README
+
+================================================================================
+RELATED ISSUES
+================================================================================
+
+This solution addresses:
+- Tailwind classes not applying in Next.js 14
+- Tailwind JIT not detecting classes in monorepos
+- PostCSS not processing Tailwind in pnpm workspaces
+- Next.js caching preventing style updates
+- Route group conflicts causing 404 errors
+
+================================================================================
+LAST UPDATED: October 2025  
+TESTED ON: Next.js 14.1.0, Tailwind CSS 3.x, pnpm 8.x, Node 20.x
+================================================================================
+

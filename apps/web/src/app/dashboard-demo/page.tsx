@@ -97,8 +97,9 @@ export default function DashboardDemoPage() {
                 </div>
                 <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all"
+                    className="h-full rounded-full transition-all duration-300 hover:scale-y-125 hover:h-4 origin-bottom cursor-pointer"
                     style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
+                    title={`${item.percentage}% of total emissions`}
                   />
                 </div>
               </div>
@@ -118,11 +119,14 @@ export default function DashboardDemoPage() {
               { month: 'May', value: 51 },
               { month: 'Jun', value: 42 },
             ].map((data) => (
-              <div key={data.month} className="flex-1 flex flex-col items-center">
-                <div
-                  className="w-full bg-[#1B4332] rounded-t-lg"
-                  style={{ height: `${(data.value / 72) * 100}%` }}
-                />
+              <div key={data.month} className="flex-1 flex flex-col items-center group">
+                <div className="relative w-full flex items-end justify-center" style={{ height: '240px' }}>
+                  <div
+                    className="w-full bg-[#1B4332] rounded-t-lg transition-all duration-300 hover:bg-[#2D5F4C] cursor-pointer"
+                    style={{ height: `${(data.value / 72) * 100}%` }}
+                    title={`${data.value}kg CO2`}
+                  />
+                </div>
                 <p className="text-xs text-gray-600 mt-2">{data.month}</p>
                 <p className="text-xs font-semibold text-[#1B4332]">{data.value}kg</p>
               </div>

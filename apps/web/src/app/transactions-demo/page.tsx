@@ -1,14 +1,79 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useMemo } from 'react';
+
+type SortField = 'date' | 'merchant' | 'category' | 'amount' | 'emissions';
+type SortDirection = 'asc' | 'desc';
 
 export default function TransactionsDemoPage() {
-  const transactions = [
-    { id: 1, date: '2025-10-03', merchant: 'Uber', amount: '$15.50', category: 'Transportation', emissions: '3.2 kg CO2e' },
-    { id: 2, date: '2025-10-02', merchant: 'Whole Foods', amount: '$67.89', category: 'Food & Dining', emissions: '5.1 kg CO2e' },
-    { id: 3, date: '2025-10-01', merchant: 'Shell Gas Station', amount: '$45.00', category: 'Transportation', emissions: '12.5 kg CO2e' },
-    { id: 4, date: '2025-09-30', merchant: 'Amazon', amount: '$89.99', category: 'Shopping', emissions: '2.8 kg CO2e' },
-    { id: 5, date: '2025-09-29', merchant: 'ConEd Utilities', amount: '$120.00', category: 'Utilities', emissions: '18.3 kg CO2e' },
-    { id: 6, date: '2025-09-28', merchant: 'Starbucks', amount: '$5.75', category: 'Food & Dining', emissions: '0.9 kg CO2e' },
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortField, setSortField] = useState<SortField>('date');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [syncError, setSyncError] = useState('');
+
+  const allTransactions = [
+    { id: 1, date: '2025-10-03', merchant: 'Uber', amount: 15.50, category: 'Transportation', emissions: 3.2 },
+    { id: 2, date: '2025-10-02', merchant: 'Whole Foods', amount: 67.89, category: 'Food & Dining', emissions: 5.1 },
+    { id: 3, date: '2025-10-01', merchant: 'Shell Gas Station', amount: 45.00, category: 'Transportation', emissions: 12.5 },
+    { id: 4, date: '2025-09-30', merchant: 'Amazon', amount: 89.99, category: 'Shopping', emissions: 2.8 },
+    { id: 5, date: '2025-09-29', merchant: 'ConEd Utilities', amount: 120.00, category: 'Utilities', emissions: 18.3 },
+    { id: 6, date: '2025-09-28', merchant: 'Starbucks', amount: 5.75, category: 'Food & Dining', emissions: 0.9 },
   ];
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleSync = () => {
+    setSyncError('Unable to sync transactions. Backend service is currently unavailable.');
+    setTimeout(() => setSyncError(''), 5000);
+  };
+
+  const filteredAndSortedTransactions = useMemo(() => {
+    let filtered = allTransactions.filter((tx) => {
+      const search = searchTerm.toLowerCase();
+      return (
+        tx.date.toLowerCase().includes(search) ||
+        tx.merchant.toLowerCase().includes(search) ||
+        tx.category.toLowerCase().includes(search) ||
+        tx.amount.toString().includes(search) ||
+        tx.emissions.toString().includes(search)
+      );
+    });
+
+    filtered.sort((a, b) => {
+      let aVal: any = a[sortField];
+      let bVal: any = b[sortField];
+
+      if (sortField === 'date') {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      }
+
+      if (sortDirection === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
+
+    return filtered;
+  }, [searchTerm, sortField, sortDirection]);
+
+  const SortIcon = ({ field }: { field: SortField }) => (
+    <button
+      onClick={() => handleSort(field)}
+      className="ml-1 inline-flex flex-col hover:text-[#1B4332] transition"
+    >
+      <span className={`text-xs ${sortField === field && sortDirection === 'asc' ? 'text-[#1B4332]' : 'text-gray-400'}`}>▲</span>
+      <span className={`text-xs -mt-1 ${sortField === field && sortDirection === 'desc' ? 'text-[#1B4332]' : 'text-gray-400'}`}>▼</span>
+    </button>
+  );
 
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-[#E5FCD4] text-black">
@@ -52,11 +117,25 @@ export default function TransactionsDemoPage() {
             <h1 className="text-4xl font-bold text-[#1B4332] mb-2">Transactions</h1>
             <p className="text-gray-600">View and analyze your carbon footprint</p>
           </div>
-          <button className="bg-[#1B4332] text-white px-6 py-2 rounded-lg hover:opacity-90 transition flex items-center gap-2">
+          <button 
+            onClick={handleSync}
+            className="bg-[#1B4332] text-white px-6 py-2 rounded-lg hover:opacity-90 transition flex items-center gap-2"
+          >
             <span>🔄</span>
             Sync
           </button>
         </div>
+
+        {/* Sync Error Message */}
+        {syncError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-start gap-2">
+            <span className="text-red-500 font-bold">⚠️</span>
+            <div>
+              <strong className="font-bold">Sync Error: </strong>
+              <span>{syncError}</span>
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
@@ -65,6 +144,8 @@ export default function TransactionsDemoPage() {
               <input
                 type="text"
                 placeholder="Search transactions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B4332]"
               />
             </div>
@@ -90,43 +171,56 @@ export default function TransactionsDemoPage() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
+                  <SortIcon field="date" />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Merchant
+                  <SortIcon field="merchant" />
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Category
+                  <SortIcon field="category" />
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount
+                  <SortIcon field="amount" />
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Carbon Footprint
+                  <SortIcon field="emissions" />
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {transactions.map((tx, index) => (
-                <tr key={tx.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                    {tx.date}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{tx.merchant}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#1B4332]/10 text-[#1B4332]">
-                      {tx.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
-                    {tx.amount}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right">
-                    <span className="text-sm font-semibold text-[#1B4332]">{tx.emissions}</span>
+              {filteredAndSortedTransactions.length > 0 ? (
+                filteredAndSortedTransactions.map((tx, index) => (
+                  <tr key={tx.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      {tx.date}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{tx.merchant}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2 py-1 text-xs font-semibold rounded-full bg-[#1B4332]/10 text-[#1B4332]">
+                        {tx.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                      ${tx.amount.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <span className="text-sm font-semibold text-[#1B4332]">{tx.emissions} kg CO2e</span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    No transactions found matching your search.
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -136,15 +230,19 @@ export default function TransactionsDemoPage() {
           <div className="grid grid-cols-3 gap-6">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Transactions</p>
-              <p className="text-2xl font-bold text-[#1B4332]">{transactions.length}</p>
+              <p className="text-2xl font-bold text-[#1B4332]">{filteredAndSortedTransactions.length}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Spent</p>
-              <p className="text-2xl font-bold text-[#1B4332]">$344.13</p>
+              <p className="text-2xl font-bold text-[#1B4332]">
+                ${filteredAndSortedTransactions.reduce((sum, tx) => sum + tx.amount, 0).toFixed(2)}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Emissions</p>
-              <p className="text-2xl font-bold text-[#1B4332]">42.8 kg CO2e</p>
+              <p className="text-2xl font-bold text-[#1B4332]">
+                {filteredAndSortedTransactions.reduce((sum, tx) => sum + tx.emissions, 0).toFixed(1)} kg CO2e
+              </p>
             </div>
           </div>
         </div>
@@ -167,4 +265,3 @@ export default function TransactionsDemoPage() {
     </main>
   );
 }
-

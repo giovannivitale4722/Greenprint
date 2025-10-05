@@ -21,7 +21,7 @@ export default function LoginPage() {
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: (data) => {
       setAuth(data.user, data.token);
-      router.push('/app/dashboard');
+      router.push('/dashboard-demo');
     },
     onError: (err) => {
       setError(err.message);
@@ -31,7 +31,7 @@ export default function LoginPage() {
   const registerMutation = trpc.auth.register.useMutation({
     onSuccess: (data) => {
       setAuth(data.user, data.token);
-      router.push('/app/dashboard');
+      router.push('/dashboard-demo');
     },
     onError: (err) => {
       setError(err.message);

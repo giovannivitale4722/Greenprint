@@ -78,8 +78,9 @@ export default function InsightsDemoPage() {
                 </div>
                 <div className="h-3 w-full rounded-full bg-gray-100 overflow-hidden">
                   <div
-                    className="h-full bg-[#1B4332] rounded-full transition-all"
+                    className="h-full bg-[#1B4332] rounded-full transition-all duration-300 hover:scale-y-125 hover:h-4 origin-bottom cursor-pointer"
                     style={{ width: `${category.percentage}%` }}
+                    title={`${category.percentage}% of total emissions`}
                   />
                 </div>
               </div>

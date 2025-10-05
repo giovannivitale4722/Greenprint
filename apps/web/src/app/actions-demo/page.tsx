@@ -1,14 +1,24 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
+
+interface Action {
+  id: number;
+  title: string;
+  description: string;
+  impact: string;
+  difficulty?: string;
+  acceptedDate?: string;
+}
 
 export default function ActionsDemoPage() {
-  const recommendations = [
+  const initialRecommendations: Action[] = [
     {
       id: 1,
       title: 'Switch to Public Transportation',
       description: 'Replace 2 car trips per week with public transit to reduce your transportation emissions by 30%',
       impact: '4.5 kg CO2e/month',
       difficulty: 'Easy',
-      status: 'pending',
     },
     {
       id: 2,
@@ -16,7 +26,6 @@ export default function ActionsDemoPage() {
       description: 'Try Meatless Mondays or reduce meat intake by 25% to lower food-related emissions',
       impact: '3.2 kg CO2e/month',
       difficulty: 'Medium',
-      status: 'pending',
     },
     {
       id: 3,
@@ -24,26 +33,26 @@ export default function ActionsDemoPage() {
       description: 'Adjust thermostat by 2°F and switch to LED bulbs to reduce utility emissions',
       impact: '2.8 kg CO2e/month',
       difficulty: 'Easy',
-      status: 'pending',
     },
   ];
 
-  const acceptedActions = [
-    {
-      id: 4,
-      title: 'Use Reusable Shopping Bags',
-      description: 'Bring reusable bags for all shopping trips',
-      impact: '0.5 kg CO2e/month',
-      acceptedDate: '2025-09-15',
-    },
-    {
-      id: 5,
-      title: 'Carpool When Possible',
-      description: 'Share rides with colleagues twice a week',
-      impact: '1.8 kg CO2e/month',
-      acceptedDate: '2025-09-10',
-    },
-  ];
+  const [recommendations, setRecommendations] = useState<Action[]>(initialRecommendations);
+  const [acceptedActions, setAcceptedActions] = useState<Action[]>([]);
+  const [generateError, setGenerateError] = useState('');
+
+  const handleAccept = (action: Action) => {
+    const acceptedAction = {
+      ...action,
+      acceptedDate: new Date().toISOString().split('T')[0],
+    };
+    setAcceptedActions([...acceptedActions, acceptedAction]);
+    setRecommendations(recommendations.filter(rec => rec.id !== action.id));
+  };
+
+  const handleGenerateNew = () => {
+    setGenerateError('Unable to generate new recommendations. AI service is currently unavailable.');
+    setTimeout(() => setGenerateError(''), 5000);
+  };
 
   return (
     <main className="min-h-screen max-w-full overflow-x-hidden bg-[#E5FCD4] text-black">
@@ -87,11 +96,25 @@ export default function ActionsDemoPage() {
             <h1 className="text-4xl font-bold text-[#1B4332] mb-2">Action Plan</h1>
             <p className="text-gray-600">Personalized recommendations to reduce your carbon footprint</p>
           </div>
-          <button className="bg-[#1B4332] text-white px-6 py-2 rounded-lg hover:opacity-90 transition flex items-center gap-2">
+          <button 
+            onClick={handleGenerateNew}
+            className="bg-[#1B4332] text-white px-6 py-2 rounded-lg hover:opacity-90 transition flex items-center gap-2"
+          >
             <span>✨</span>
             Generate New Recommendations
           </button>
         </div>
+
+        {/* Generate Error Message */}
+        {generateError && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-start gap-2">
+            <span className="text-red-500 font-bold">⚠️</span>
+            <div>
+              <strong className="font-bold">Error: </strong>
+              <span>{generateError}</span>
+            </div>
+          </div>
+        )}
 
         {/* Impact Summary */}
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-8">
@@ -103,7 +126,9 @@ export default function ActionsDemoPage() {
             </div>
             <div>
               <p className="text-sm text-gray-600 mb-1">Potential Savings</p>
-              <p className="text-3xl font-bold text-green-600">10.5 kg</p>
+              <p className="text-3xl font-bold text-green-600">
+                {recommendations.reduce((sum, rec) => sum + parseFloat(rec.impact), 0).toFixed(1)} kg
+              </p>
               <p className="text-xs text-gray-500">CO2e per month</p>
             </div>
             <div>
@@ -113,85 +138,113 @@ export default function ActionsDemoPage() {
           </div>
         </div>
 
+        {/* Active Goals */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-[#1B4332] mb-4">Your Active Goals</h2>
+          {acceptedActions.length === 0 ? (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-8 text-center">
+              <div className="text-6xl mb-4">🎯</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Active Goals Yet</h3>
+              <p className="text-gray-600 mb-4">
+                Start your sustainability journey by accepting recommendations below!
+              </p>
+              <p className="text-sm text-gray-500">
+                Each action you take helps reduce your carbon footprint and makes a real difference for our planet.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {acceptedActions.map((action) => (
+                <div
+                  key={action.id}
+                  className="bg-white rounded-xl p-6 shadow-sm border-2 border-green-200"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">✅</span>
+                        <h3 className="text-lg font-bold text-gray-900">{action.title}</h3>
+                      </div>
+                      <p className="text-gray-600 mb-3">{action.description}</p>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500">Saving:</span>
+                          <span className="text-sm font-semibold text-green-600">{action.impact}</span>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Started: {action.acceptedDate ? new Date(action.acceptedDate).toLocaleDateString() : 'N/A'}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="ml-4">
+                      <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-semibold text-sm">
+                        Active
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Pending Recommendations */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-[#1B4332] mb-4">Recommended Actions</h2>
-          <div className="space-y-4">
-            {recommendations.map((rec) => (
-              <div key={rec.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-bold text-gray-900">{rec.title}</h3>
-                      <span
-                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                          rec.difficulty === 'Easy'
-                            ? 'bg-green-100 text-green-700'
-                            : rec.difficulty === 'Medium'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-red-100 text-red-700'
-                        }`}
-                      >
-                        {rec.difficulty}
-                      </span>
-                    </div>
-                    <p className="text-gray-600 mb-3">{rec.description}</p>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Impact:</span>
-                        <span className="text-sm font-semibold text-[#1B4332]">{rec.impact}</span>
+          {recommendations.length === 0 ? (
+            <div className="bg-white rounded-xl p-8 text-center border border-gray-200">
+              <div className="text-6xl mb-4">🎉</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">All Caught Up!</h3>
+              <p className="text-gray-600">
+                You've accepted all available recommendations. Click "Generate New Recommendations" to see more suggestions.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {recommendations.map((rec) => (
+                <div key={rec.id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-bold text-gray-900">{rec.title}</h3>
+                        {rec.difficulty && (
+                          <span
+                            className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                              rec.difficulty === 'Easy'
+                                ? 'bg-green-100 text-green-700'
+                                : rec.difficulty === 'Medium'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-red-100 text-red-700'
+                            }`}
+                          >
+                            {rec.difficulty}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <span>🌱</span>
-                        <span>Equivalent to planting 0.5 trees</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button className="ml-4 bg-[#1B4332] text-white px-6 py-2 rounded-lg hover:opacity-90 transition flex items-center gap-2">
-                    <span>✓</span>
-                    Accept
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Accepted Actions */}
-        <div>
-          <h2 className="text-2xl font-bold text-[#1B4332] mb-4">Your Active Goals</h2>
-          <div className="space-y-4">
-            {acceptedActions.map((action) => (
-              <div
-                key={action.id}
-                className="bg-white rounded-xl p-6 shadow-sm border-2 border-green-200"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl">✅</span>
-                      <h3 className="text-lg font-bold text-gray-900">{action.title}</h3>
-                    </div>
-                    <p className="text-gray-600 mb-3">{action.description}</p>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Saving:</span>
-                        <span className="text-sm font-semibold text-green-600">{action.impact}</span>
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Started: {new Date(action.acceptedDate).toLocaleDateString()}
+                      <p className="text-gray-600 mb-3">{rec.description}</p>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-500">Impact:</span>
+                          <span className="text-sm font-semibold text-[#1B4332]">{rec.impact}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                          <span>🌱</span>
+                          <span>Equivalent to planting 0.5 trees</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="ml-4">
-                    <div className="bg-green-100 text-green-700 px-4 py-2 rounded-lg font-semibold text-sm">
-                      Active
-                    </div>
+                    <button 
+                      onClick={() => handleAccept(rec)}
+                      className="ml-4 bg-[#1B4332] text-white px-6 py-2 rounded-lg hover:opacity-90 transition flex items-center gap-2"
+                    >
+                      <span>✓</span>
+                      Accept
+                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Tips Section */}
@@ -235,4 +288,3 @@ export default function ActionsDemoPage() {
     </main>
   );
 }
-
