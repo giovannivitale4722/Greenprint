@@ -1,3 +1,24 @@
-# Docker Compose file removed - using local PostgreSQL instead
-# Install PostgreSQL locally and run: ./setup.sh
+version: '3.8'
 
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: carbon-ledger-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: carbon_ledger
+    ports:
+      - "5432:5432"
+    volumes:
+      - carbon-ledger-data:/var/lib/postgresql/data
+      - ./apps/api/src/prisma/schema.prisma:/docker-entrypoint-initdb.d/schema.prisma:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  carbon-ledger-data:
+    driver: local

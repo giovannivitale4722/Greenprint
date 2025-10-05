@@ -8,11 +8,13 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "test": "turbo run test",
+    "setup": "echo 'Choose your platform: ./scripts/dev-setup.sh (macOS/Linux/WSL2) or scripts/dev-setup.bat (Windows)'",
     "db:push": "pnpm --filter @carbon-ledger/api prisma db push",
     "db:migrate": "pnpm --filter @carbon-ledger/api prisma migrate dev",
     "db:migrate:deploy": "pnpm --filter @carbon-ledger/api prisma migrate deploy",
     "db:seed": "pnpm --filter @carbon-ledger/api tsx apps/api/src/prisma/seeds/seed.ts",
     "db:studio": "pnpm --filter @carbon-ledger/api prisma studio",
+    "db:reset": "docker compose down && docker volume rm greenprint_carbon-ledger-data && docker compose up -d db && sleep 10 && pnpm db:seed",
     "clean": "turbo run clean && rm -rf node_modules"
   },
   "packageManager": "pnpm@8.15.0",

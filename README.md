@@ -84,26 +84,36 @@ carbon-ledger/
 
 ## 🚀 Quick Start
 
+### For Team Members
+**👉 See [TEAM_SETUP.md](./TEAM_SETUP.md) for detailed cross-platform setup instructions**
+
 ### Prerequisites
 
 - Node.js 20+
 - pnpm 8+
-- PostgreSQL (local installation)
+- Docker Desktop (with WSL2 integration on Windows)
 
-### Setup (Choose Your Platform)
+### Quick Setup (Choose Your Platform)
 
 #### macOS/Linux
 ```bash
 git clone <your-repo-url>
 cd carbon-ledger
-./setup.sh
+./scripts/dev-setup.sh
 ```
 
-#### Windows
+#### Windows (WSL2)
 ```bash
 git clone <your-repo-url>
 cd carbon-ledger
-setup.bat
+./scripts/dev-setup.sh
+```
+
+#### Windows (PowerShell/CMD)
+```cmd
+git clone <your-repo-url>
+cd carbon-ledger
+scripts\dev-setup.bat
 ```
 
 ### Start the Application
