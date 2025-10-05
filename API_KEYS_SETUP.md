@@ -193,7 +193,7 @@ The `.env` file is already in your `.gitignore`, so your keys are safe from bein
 4. **Use environment-specific files**
    - `.env` - Local development (gitignored)
    - `.env.example` - Template (committed to git)
-   - Production - Use AWS Secrets Manager
+   - Production - Use secure environment variable management
 
 5. **Monitor API usage**
    - Check Nessie dashboard

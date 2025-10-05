@@ -86,7 +86,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
               <li>
-                <strong>Service Providers:</strong> For hosting, analytics, and carbon footprint calculations (e.g., AWS, Climatiq API).
+                <strong>Service Providers:</strong> For hosting, analytics, and carbon footprint calculations (e.g., Climatiq API).
               </li>
               <li>
                 <strong>Legal Compliance:</strong> If required by law or to protect our rights.

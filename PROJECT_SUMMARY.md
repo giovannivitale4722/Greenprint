@@ -11,7 +11,7 @@ Carbon Ledger is a production-ready FinTech sustainability application that tran
 - ✅ Backend API (Express + tRPC)
 - ✅ Frontend web app (Next.js 14)
 - ✅ Shared packages (types, db, emissions)
-- ✅ AWS deployment configs (both options)
+- ✅ Production deployment configs
 - ✅ Comprehensive documentation
 
 ### Backend (`apps/api/`)
@@ -42,26 +42,19 @@ Carbon Ledger is a production-ready FinTech sustainability application that tran
 - ✅ **Unit Tests**: Complete test coverage for calculations
 - ✅ **Transparency**: Method, source, and confidence tracking
 
-### AWS Deployment
-- ✅ **Option A (Fast Path)**: Amplify + App Runner + RDS
-  - Complete step-by-step guide
-  - Service configuration JSON
-  - Build settings
-  - Cost estimates (~$57-103/mo)
-  
-- ✅ **Option B (Production)**: ECS/Fargate + Copilot
-  - Copilot manifests for both services
-  - GitHub Actions workflows
-  - Health checks and auto-scaling
-  - Cost estimates (~$58-83/mo)
+### Production Deployment
+- ✅ **Containerized Deployment**: Docker-based deployment
+  - Complete Docker configurations
+  - Multi-stage builds
+  - Health checks and monitoring
+  - Production-ready setup
 
 ### Documentation (6 Comprehensive Guides)
 1. **README.md**: Complete overview and quick start
 2. **QUICKSTART.md**: 5-minute setup guide
 3. **ARCHITECTURE.md**: Deep technical documentation
 4. **FEATURES.md**: Feature checklist and roadmap
-5. **AWS Option A Guide**: Managed services deployment
-6. **AWS Option B Guide**: Container orchestration
+5. **Deployment Guide**: Production deployment instructions
 
 ## 📊 By The Numbers
 
@@ -162,9 +155,6 @@ carbon-ledger/
 │   ├── types/            (Shared types)
 │   ├── db/               (Prisma client)
 │   └── emissions/        (Carbon engine)
-├── aws/
-│   ├── option-a/         (Amplify + App Runner)
-│   └── option-b/         (ECS + Copilot)
 ├── .github/workflows/    (CI/CD)
 ├── README.md             (Main documentation)
 ├── QUICKSTART.md         (Setup guide)
@@ -255,10 +245,9 @@ carbon-ledger/
    - Recommendation engine
    - Docker deployment
 
-3. **AWS Deployment**:
+3. **Production Deployment**:
    - Show deployment docs
-   - Explain both options
-   - Cost comparison
+   - Explain deployment options
    - Scalability approach
 
 ## 🏆 Sponsor Alignment
@@ -307,14 +296,14 @@ pnpm dev
 - **QUICKSTART.md**: 5-minute setup
 - **ARCHITECTURE.md**: Technical deep dive
 - **FEATURES.md**: Feature checklist
-- **AWS Guides**: Deployment instructions
+- **Deployment Guides**: Production deployment instructions
 
 ## ✅ Project Status: COMPLETE
 
 All deliverables from your prompt have been implemented, tested, and documented. The application is ready for:
 - ✅ Local development
 - ✅ Demo/presentation
-- ✅ AWS deployment (both paths)
+- ✅ Production deployment ready
 - ✅ Further customization
 - ✅ Production use
 

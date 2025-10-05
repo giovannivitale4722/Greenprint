@@ -49,7 +49,7 @@ export class RecommendationsService {
 
     // Transport.fuel recommendations
     const fuelStats = categoryStats.find((c) => c.category === 'transport.fuel');
-    if (fuelStats && fuelStats.percentage > 20) {
+    if (fuelStats && fuelStats.percentage > 5) {
       recommendations.push({
         title: 'Reduce Driving Emissions',
         description: `Fuel purchases account for ${fuelStats.percentage.toFixed(1)}% of your carbon footprint. Try carpooling or public transit 2 days per week to reduce emissions by ~20%.`,
@@ -59,7 +59,7 @@ export class RecommendationsService {
     }
 
     // Public transit alternative
-    if (fuelStats && fuelStats.totalKg > 50) {
+    if (fuelStats && fuelStats.totalKg > 5) {
       recommendations.push({
         title: 'Switch to Public Transportation',
         description: 'Replace one weekly car trip with public transit. Public transit emits 45% less CO2 per passenger mile than driving alone.',
@@ -70,7 +70,7 @@ export class RecommendationsService {
 
     // Electricity recommendations
     const electricityStats = categoryStats.find((c) => c.category === 'utilities.electricity');
-    if (electricityStats && electricityStats.totalKg > 80) {
+    if (electricityStats && electricityStats.totalKg > 10) {
       recommendations.push({
         title: 'Optimize Home Energy Use',
         description: 'Your electricity usage is above average. Switch to LED bulbs, adjust thermostat by 2°F, and use power strips to eliminate phantom loads. Potential reduction: 15-20%.',
@@ -106,7 +106,7 @@ export class RecommendationsService {
     const groceryStats = categoryStats.find((c) => c.category === 'grocery');
     const foodEmissions = (restaurantStats?.totalKg || 0) + (groceryStats?.totalKg || 0);
     
-    if (foodEmissions > 60) {
+    if (foodEmissions > 5) {
       recommendations.push({
         title: 'Reduce Food Carbon Footprint',
         description: 'Food accounts for a significant portion of your emissions. Try one meatless day per week, reduce food waste, and buy local produce.',
@@ -116,7 +116,7 @@ export class RecommendationsService {
     }
 
     // General efficiency recommendation
-    if (totalEmissions > 200) {
+    if (totalEmissions > 10) {
       recommendations.push({
         title: 'Set a Monthly Carbon Budget',
         description: `Your monthly emissions are ${totalEmissions.toFixed(0)} kg CO2e. Set a goal to reduce by 10% next month through small changes across all categories.`,

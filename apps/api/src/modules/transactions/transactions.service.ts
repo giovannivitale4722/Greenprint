@@ -7,7 +7,7 @@ export class TransactionsService {
   /**
    * Sync transactions from Nessie API
    */
-  async syncTransactions(accountId: string, useRealNessie = false) {
+  async syncTransactions(accountId: string, useRealNessie = true) {
     const account = await prisma.account.findUnique({
       where: { id: accountId },
     });

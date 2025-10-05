@@ -181,9 +181,8 @@ pnpm dev
 - Update `.env` with your key
 - Set `USE_LOCAL_EMISSION_DATA=false` to use Climatiq
 
-### Deploy to AWS
-- See `aws/option-a/` for Amplify + App Runner
-- See `aws/option-b/` for ECS/Fargate with Copilot
+### Deploy to Production
+- See deployment documentation for containerized deployment
 
 ## Development Workflow
 

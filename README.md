@@ -20,7 +20,7 @@ Carbon Ledger is a FinTech sustainability application that integrates with Capit
 - 🎯 **Smart Recommendations**: Personalized actions to reduce your carbon footprint
 - 🔬 **Transparent Methodology**: View emission factors and calculation methods
 - 📈 **Progress Tracking**: Set carbon budgets and monitor improvements
-- 🚀 **AWS Ready**: Complete deployment configs for production scale
+- 🚀 **Production Ready**: Complete deployment configs for production scale
 
 ## 🏗️ Architecture
 
@@ -32,7 +32,7 @@ Carbon Ledger is a FinTech sustainability application that integrates with Capit
 - **Backend**: Node.js 20, Express + tRPC, Zod validation
 - **Database**: PostgreSQL via Prisma ORM
 - **Auth**: JWT-based authentication
-- **Jobs**: node-cron (local), EventBridge Scheduler (AWS)
+- **Jobs**: node-cron (local), scheduled tasks
 
 ### Project Structure
 
@@ -72,10 +72,6 @@ carbon-ledger/
 │       ├── classify.ts           # MCC → category mapping
 │       ├── estimate.ts           # CO₂e estimation
 │       └── datasets.ts           # Local emission factors
-│
-├── aws/
-│   ├── option-a/                 # Amplify + App Runner
-│   └── option-b/                 # ECS/Fargate + Copilot
 │
 ├── setup.sh                     # Universal setup script
 ├── setup.bat                    # Windows setup script
@@ -246,40 +242,30 @@ POST /jobs/recompute-monthly      # Generate recommendations
 GET  /health                      # Health check
 ```
 
-## ☁️ AWS Deployment
+## 🚀 Deployment
 
-### Option A: Fast Path (Managed Services)
+### Local Development
 
-**Best for**: Rapid deployment, minimal ops
+**Best for**: Development and testing
 
-- **Frontend**: AWS Amplify Hosting
-- **Backend**: AWS App Runner
-- **Database**: RDS PostgreSQL
-
-```bash
-cd aws/option-a
-# Follow app-runner-readme.md
-```
-
-**Cost**: ~$57-103/month
-
-### Option B: Production Path (ECS/Fargate)
-
-**Best for**: Production scale, full control
-
-- **Services**: ECS on Fargate
-- **Routing**: Application Load Balancer
-- **Registry**: Amazon ECR
-- **IaC**: AWS Copilot CLI
+- **Frontend**: Next.js development server
+- **Backend**: Express + tRPC
+- **Database**: PostgreSQL via Docker
 
 ```bash
-cd aws/option-b
-# Follow README.md
+pnpm dev
 ```
 
-**Cost**: ~$58-83/month
+### Production Deployment
 
-See detailed deployment guides in `aws/` directory.
+**Best for**: Production deployment
+
+- **Frontend**: Static export or containerized
+- **Backend**: Containerized Express app
+- **Database**: Managed PostgreSQL
+- **Infrastructure**: Docker containers
+
+See deployment documentation for your preferred platform.
 
 ## 🧪 Testing
 
@@ -312,7 +298,7 @@ See `apps/api/src/prisma/schema.prisma` for full schema.
 
 - Passwords hashed with bcrypt
 - JWT tokens for API authentication
-- Secrets managed via AWS Secrets Manager
+- Secrets managed via environment variables
 - Minimal PII collection (email only)
 - Data export and account deletion available
 - All database queries parameterized (Prisma)
@@ -371,7 +357,7 @@ git push origin feature/your-feature
 - **Emission Factors**: `packages/emissions/src/datasets.ts`
 - **MCC Mapping**: `packages/emissions/src/constants.ts`
 - **API Documentation**: tRPC provides type-safe API
-- **Deployment Guides**: See `aws/` directory
+- **Deployment Guides**: See deployment documentation
 
 ## 🏆 Hackathon Highlights
 
@@ -387,7 +373,7 @@ git push origin feature/your-feature
 
 ### Technical Excellence
 - Production-ready architecture
-- Comprehensive AWS deployment options
+- Production-ready deployment options
 - Type-safe end-to-end TypeScript
 - Modern tooling (tRPC, Prisma, Next.js 14)
 - Complete CI/CD configurations

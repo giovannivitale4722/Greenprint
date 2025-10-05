@@ -113,16 +113,6 @@ carbon-ledger/
 │           ├── datasets.ts           # Emission factors
 │           └── constants.ts          # MCC mappings
 │
-└── aws/                              # Deployment configurations
-    ├── option-a/                     # Managed services path
-    │   ├── app-runner-readme.md
-    │   ├── apprunner-service.json
-    │   └── amplify-build-settings.md
-    └── option-b/                     # Container orchestration path
-        ├── copilot/
-        │   ├── api/manifest.yml
-        │   └── web/manifest.yml
-        └── github-actions/
 ```
 
 ## Data Flow
@@ -316,34 +306,16 @@ function estimateEmissions(amount: number, category: string, description: string
 
 ## Deployment Architecture
 
-### Option A: Managed Services
+### Production Deployment
 
 ```
 Internet
     ↓
-CloudFront (Amplify)
-    ↓
-Next.js (Amplify)
-    ↓
-API Gateway (App Runner)
-    ↓
-Express + tRPC (App Runner)
-    ↓
-RDS PostgreSQL (Private Subnet)
-```
-
-**Advantages**: Fast deployment, managed scaling, minimal ops
-
-### Option B: Container Orchestration
-
-```
-Internet
-    ↓
-Application Load Balancer
-    ├── /api/* → API Service (ECS Fargate)
-    └── /*     → Web Service (ECS Fargate)
+Load Balancer
+    ├── /api/* → API Service (Container)
+    └── /*     → Web Service (Container)
              ↓
-        RDS PostgreSQL (Private Subnet)
+        PostgreSQL Database
 ```
 
 **Advantages**: Full control, cost optimization, production-grade
@@ -365,7 +337,7 @@ Application Load Balancer
 
 ### Secrets Management
 - Environment variables (local)
-- AWS Secrets Manager (production)
+- Environment variables (production)
 - No secrets in code/git
 - Secret rotation support
 
@@ -374,11 +346,11 @@ Application Load Balancer
 ### Logging
 - Structured logging with timestamps
 - Log levels (info, warn, error, debug)
-- CloudWatch Logs (AWS)
+- Structured logging
 
 ### Metrics
-- Container Insights (ECS)
-- CloudWatch Metrics
+- Container monitoring
+- Application metrics
 - Health check endpoints
 
 ### Error Tracking
@@ -410,7 +382,7 @@ Application Load Balancer
 ### Horizontal Scaling
 - Stateless services
 - Load balancer distribution
-- Auto-scaling policies (ECS)
+- Auto-scaling policies
 
 ### Database Scaling
 - Read replicas (future)
@@ -435,8 +407,7 @@ GitHub Actions CI
     └── Build
     ↓
 Manual Deploy (for now)
-    ├── Option A: Amplify Console + App Runner
-    └── Option B: Copilot CLI → ECS
+    └── Container deployment
 ```
 
 ## Testing Strategy

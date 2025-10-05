@@ -78,7 +78,7 @@
 - [x] Emission recomputation
 - [x] Cron scheduling (node-cron)
 - [x] Manual job triggers (HTTP endpoints)
-- [x] EventBridge Scheduler support
+- [x] Scheduled task support
 
 ### 🎨 UI/UX
 - [x] Modern, clean design
@@ -97,17 +97,16 @@
 - [x] Docker Compose for local dev
 - [x] Dockerfile for API
 - [x] Dockerfile for Web
-- [x] AWS Amplify config
-- [x] AWS App Runner config
-- [x] AWS Copilot manifests
+- [x] Docker configurations
+- [x] Production deployment configs
 - [x] GitHub Actions CI
 - [x] Environment variable management
-- [x] Secrets Manager integration
+- [x] Environment variable management
 
 ### 📚 Documentation
 - [x] Comprehensive README
 - [x] Quick Start guide
-- [x] AWS deployment guides (both options)
+- [x] Production deployment guides
 - [x] API reference (tRPC types)
 - [x] Architecture documentation
 - [x] Feature checklist
@@ -178,10 +177,9 @@
 - [x] Inspect transactions with CO₂e estimates
 - [x] Factor transparency (method, source, confidence)
 - [x] Recommendations with projected reductions
-- [x] Option A: Amplify + App Runner configs ready
-- [x] Option B: ECS/Fargate + Copilot configs ready
-- [x] Secrets via Secrets Manager
-- [x] EventBridge Scheduler job endpoints
+- [x] Production deployment configs ready
+- [x] Secrets via environment variables
+- [x] Scheduled job endpoints
 - [x] .env.example complete
 - [x] Toggle Climatiq vs local (one-flag change)
 
@@ -190,7 +188,7 @@
 ## 🏆 Bonus Features
 
 - ✨ Beautiful, modern UI beyond requirements
-- ✨ Comprehensive AWS deployment for BOTH paths
+- ✨ Comprehensive production deployment ready
 - ✨ GitHub Actions CI/CD ready
 - ✨ Detailed troubleshooting guides
 - ✨ Multiple chart types (pie, line)

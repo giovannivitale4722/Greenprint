@@ -75,7 +75,7 @@ export default function HomePage() {
             />
           </div>
           <p className="text-center text-xs text-gray-500 mt-2">
-            Our AWS-powered backend and open-data integrations make carbon tracking efficient, transparent, and environmentally responsible.
+            Our production-ready backend and open-data integrations make carbon tracking efficient, transparent, and environmentally responsible.
           </p>
         </div>
 
