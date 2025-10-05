@@ -328,7 +328,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/carbon_ledger
 JWT_SECRET=your-secret-key
 
 # External APIs (optional)
-NESSIE_API_BASE=https://api.reimaginebanking.com
+NESSIE_API_BASE=https://apps.nessie.com
 NESSIE_API_KEY=your-key
 
 CLIMATIQ_API_BASE=https://api.climatiq.io

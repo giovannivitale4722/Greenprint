@@ -15,7 +15,7 @@ JWT_SECRET=dev-secret-change-in-production
 PORT=4000
 
 # External APIs
-NESSIE_API_BASE=https://api.reimaginebanking.com
+NESSIE_API_BASE=http://api.nessieisreal.com
 NESSIE_API_KEY=9a61128e72966e67649ec43222e120c9
 
 CLIMATIQ_API_BASE=https://api.climatiq.io

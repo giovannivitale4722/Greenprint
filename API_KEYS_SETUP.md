@@ -131,7 +131,7 @@ DATABASE_URL=postgresql://giovanni@localhost:5432/carbon_ledger?schema=public
 JWT_SECRET=dev-secret-change-in-production
 
 # External APIs
-NESSIE_API_BASE=https://api.reimaginebanking.com
+NESSIE_API_BASE=https://apps.nessie.com
 NESSIE_API_KEY=                    # <-- ADD YOUR KEY HERE
 
 CLIMATIQ_API_BASE=https://api.climatiq.io
@@ -207,7 +207,7 @@ The `.env` file is already in your `.gitignore`, so your keys are safe from bein
 ### Test Nessie Connection
 ```bash
 # Using curl
-curl -X GET "https://api.reimaginebanking.com/accounts?key=YOUR_KEY"
+curl -X GET "https://apps.nessie.com/accounts?key=YOUR_KEY"
 
 # Should return JSON with account data
 ```
